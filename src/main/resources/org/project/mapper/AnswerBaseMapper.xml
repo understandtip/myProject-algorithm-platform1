@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.project.mapper.AnswerBaseMapper">
+
+    <!--<select id ="selectByCondition">
+            select *
+            from db1.tb_brand
+            <choose>
+                <when test="">
+
+                </when>
+                <when test="">
+
+                </when>
+                <otherwise>
+
+                </otherwise>
+            </choose>
+            <trim>
+                <where>
+                    <set>
+
+                    </set>
+                </where>
+            </trim>
+            <foreach collection="ids" item="id" separator="," open="(" close=")" >
+
+            </foreach>
+        </select>-->
+</mapper>

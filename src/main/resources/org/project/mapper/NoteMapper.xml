@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="org.project.mapper.NoteMapper">
+
+    <resultMap type="Note" id="noteWithFollows">
+        <!--
+            留言的结果集映射，由于查询结果设计嵌套，字段众多，因此需要为字段定义别名
+            根留言使用note_开头，回复使用follow_开头
+        -->
+        <result property="id" column="id"/>
+        <result property="nickname" column="nickname"/>
+        <result property="content" column="content"/>
+        <result property="time" column="time"/>
+        <result property="isDelete" column="isDelete"/>
+
+        <collection property="follows" javaType="list" ofType="note" columnPrefix="follow_">
+            <id property="id" column="id"/>
+            <result property="nickname" column="nickname"/>
+            <result property="content" column="content"/>
+            <result property="time" column="time"/>
+            <result property="respondent" column="respondent"/>
+            <result property="resId" column="res_id"/>
+            <result property="replyPost" column="reply_post"/>
+        </collection>
+    </resultMap>
+
+    <!--<insert id="addNote">
+        insert into note(content,nickname,time,reply_post,res_id,aid)value( #{note.content}, #{note.nickname},#{note.time},#{note.replyPost},#{note.resId},#{note.aid})
+    </insert>-->
+    <select id="getAll" resultMap="noteWithFollows">
+        select
+            n1.n_id as id,
+            n1.content as content,
+            n1.nickname as nickname,
+            n1.time as time,
+            n1.is_delete as isDelete,
+            n2.n_id 		as follow_id,
+            n2.content 		as follow_content,
+            n2.nickname		as follow_nickname,
+            n2.time			as follow_time,
+            n2.res_id		as follow_res_id,
+            n2.reply_post	as follow_reply_post,
+            n2.is_delete	as follow_is_delete
+        from
+            note n1
+                LEFT JOIN note n2 on n1.n_id = n2.res_id
+        where
+            n1.aid = #{aid}
+        and
+            n1.reply_post = 0
+        order by
+            n1.time desc,
+            n2.time
+    </select>
+</mapper>

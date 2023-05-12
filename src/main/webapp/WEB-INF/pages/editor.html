@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>新建笔记</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link rel="stylesheet" href="../static/css/editormd.css"/>
+  <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css"/>
+  <link rel="stylesheet" type="text/css" href="/static/css/self/demo.css"/>
+</head>
+<body class="body-left-hidden">
+<div id="layout">
+  <div class="container-fluid">
+    <div class="row">
+      <div th:replace="public::slidebar"></div>
+      <div class="col-10 max-height rounded">
+        <form id="article_form">
+          <div class="input-group mb-3">
+            //这是我自己加的input文本框，用来提交标题
+            <div class="input-group-prepend">
+              <span class="input-group-text">标题</span>
+            </div>
+            <input type="text" name="title" class="form-control" placeholder="Title"/>
+          </div>
+          //这里就是写笔记的地方
+          <div id="test-editormd">
+            <textarea style="display:none;"></textarea>
+          </div>
+          //这里是提交按钮和清空按钮
+          <div class="row mx-auto">
+            <div class="col-1 mx-auto">
+              <a id="article_save" class="btn btn-primary text-white mx-auto d-block">保存</a>
+            </div>
+            <div class="col-1 mx-auto">
+              <a id="article_cancel" class="btn btn-dark text-white mx-auto d-block">清空</a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="/js/jQuery.min.js"></script>
+<script src="../static/editormd.min.js"></script>
+<script src="/static/js/bootstrap.min.js"></script>
+<script src="/static/js/bootstrap.bundle.min.js"></script>
+<script src="/static/js/self/demo.js"></script>
+<script src="/static/editor/js/self/article.js"></script>
+<script type="text/javascript">
+  let testEditor;
+  const height = $(window).height() - 150;
+  //一下代码是配置的主题颜色，具体看官网的示例
+  function themeSelect(id, themes, lsKey, callback) {
+    var select = $("#" + id);
+
+    for (var i = 0, len = themes.length; i < len; i++) {
+      var theme = themes[i];
+      var selected = (localStorage[lsKey] == theme) ? " selected=\"selected\"" : "";
+
+      select.append("<option value=\"" + theme + "\"" + selected + ">" + theme + "</option>");
+    }
+
+    select.bind("change", function () {
+      var theme = $(this).val();
+
+      if (theme === "") {
+        alert("theme == \"\"");
+        return false;
+      }
+
+      console.log("lsKey =>", lsKey, theme);
+
+      localStorage[lsKey] = theme;
+      callback(select, theme);
+    });
+
+    return select;
+  }
+
+  //这里是配置编辑器各种属性、功能
+  $(function () {
+    testEditor = editormd("test-editormd", {
+      width: "100%",
+      height: height,
+      syncScrolling: "single",
+      //注意注意：这里的path记得为自己的
+      path: "../../static/editor/lib/",
+      //开启图片上传
+      imageUpload: true,
+      imageFormats: ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
+      //图片上传路径 对应Controller层的
+      imageUploadURL: "/editor/upload",
+      //主题
+      theme: (localStorage.theme) ? localStorage.theme : "dark",
+      previewTheme: (localStorage.previewTheme) ? localStorage.previewTheme : "dark",
+      editorTheme: (localStorage.editorTheme) ? localStorage.editorTheme : "pastel-on-dark",
+    });
+    themeSelect("editormd-theme-select", editormd.themes, "theme", function ($this, theme) {
+      testEditor.setTheme(theme);
+    });
+    themeSelect("editor-area-theme-select", editormd.editorThemes, "editorTheme", function ($this, theme) {
+      testEditor.setCodeMirrorTheme(theme);
+    });
+    themeSelect("preview-area-theme-select", editormd.previewThemes, "previewTheme", function ($this, theme) {
+      testEditor.setPreviewTheme(theme);
+    });
+  });
+
+</script>
+</body>
+</html>

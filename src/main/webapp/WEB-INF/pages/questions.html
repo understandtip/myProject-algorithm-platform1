@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>题目具体信息</title>
+  <style>
+    .el-table .warning-row {
+      background: oldlace;
+    }
+
+    .el-table .success-row {
+      background: #f0f9eb;
+    }
+  </style>
+
+</head>
+<body>
+<div id="app">
+  <!--导航菜单栏-->
+  <div class="line"></div>
+  <el-menu
+          :default-active="activeIndex2"
+          class="el-menu-demo"
+          mode="horizontal"
+          @select="handleSelect"
+          background-color="#545c64"
+          text-color="#fff"
+          active-text-color="#ffd04b">
+    <el-menu-item  index="1"><a href="/mainView">个人信息</a></el-menu-item>
+    <el-menu-item  index="2"><a href="/blog">题库</a></el-menu-item>
+  </el-menu>
+  <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
+    <el-menu-item  index="1"><a href="/questions">题目</a></el-menu-item>
+    <!--<el-menu-item  index="2"><a href="alone&#45;&#45;blog2.html">用户评论</a></el-menu-item>-->
+    <el-menu-item  index="3"><a href="/answer">题解</a></el-menu-item>
+    <el-menu-item index="4" disabled>题目</el-menu-item>
+  </el-menu>
+  <!--具体信息-->
+  <el-form ref="form" :model="blog" label-width="80px">
+    <el-form-item label="题目">
+      <el-input label-width="50px" disabled="disabled" v-model="blog.title"></el-input>
+    </el-form-item>
+
+    <el-form-item label="题目具体信息">
+      <el-input disabled="disabled" :rows="40" type="textarea" v-model="blog.content"></el-input>
+    </el-form-item>
+
+    <el-form-item label="要求">
+      <el-input disabled="disabled" :rows="5" type="textarea" v-model="blog.outline"></el-input>
+    </el-form-item>
+  </el-form>
+  <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+    <el-form-item label="代码" prop="contents">
+      <el-input type="textarea" :rows="40"
+                placeholder="请输入代码" v-model="ruleForm.contents"></el-input>
+    </el-form-item>
+    <el-form-item>
+      <el-button type="primary" @click="submitForm('ruleForm')">提交</el-button>
+      <el-button @click="resetForm('ruleForm')">重置</el-button>
+      <el-tag v-show="tag2 == '答对啦！！！'"     type="success">{{tag2}}</el-tag>
+      <el-tag v-show="tag2 == '很遗憾，答错了!'"  type="danger">{{tag2}}</el-tag>
+
+    </el-form-item>
+  </el-form>
+</div>
+
+<script src="/js/vue.js"></script>
+<script src="/element-ui/lib/index.js"></script>
+<script src="/js/axios-0.18.0.js"></script>
+<link rel="stylesheet" href="/element-ui/lib/theme-chalk/index.css">
+
+<script>
+  new Vue({
+    el: "#app",
+    created(){
+    },
+    mounted(){
+      //在页面加载完成之后，发送异步请求，获取数据
+      this.forwardOn();
+    },
+    methods: {
+      forwardOn(){
+        axios({
+          method: "get",
+          url: "http://localhost/blog/selectBlog",
+        }).then(resp => {
+          //alert(resp.data);
+            this.blog = resp.data;
+        })
+      },
+      //记录用户已经答对题目
+      addAnswerbase(){
+        axios({
+          method: "post",
+          url: "http://localhost/answerBase/insertAnswerBase",
+        }).then(resp => {
+        })
+      },
+      submitForm(formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            //alert('submit!');
+            axios({
+              method: "post",
+              url: "http://localhost/blogs/test1",
+              data:this.ruleForm
+            }).then(resp => {
+              //alert(this.ruleForm);
+              if(resp.data){
+                //用户成功答题
+                this.addAnswerbase();
+                this.tag1 = "success";
+                this.tag2 = "答对啦！！！";
+              }else{
+                this.tag1 = "danger";
+                this.tag2 = "很遗憾，答错了!";
+              }
+            })
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        });
+      },
+      resetForm(formName) {
+        this.$refs[formName].resetFields();
+      },
+      tableRowClassName({row, rowIndex}) {
+        if (rowIndex === 1) {
+          return 'warning-row';
+        } else if (rowIndex === 3) {
+          return 'success-row';
+        }
+        return '';
+      },
+      //点击标签页
+      handleClick(tab, event) {
+        console.log(tab, event);
+      }
+    },
+    data() {
+      return {
+        //标签提示信息的类型
+        tag1:'',
+        //标签提示信息
+        tag2:' ',
+        ruleForm: {
+          contents: ''
+        },
+        rules: {
+          contents: [
+            { required: true, message: '请输入代码', trigger: 'blur' }
+          ]
+        },
+        //题解数据显示  通过v-show来进行展示
+
+        activeName: 'first',
+        drawer: false,
+        Bid:'',
+        inputDis:'',
+        btnColor:'',
+        // 添加数据对话框是否展示的标记
+        dialogVisible: false,
+        updateVisible: false,
+        viewvisible: false,
+        // 品牌模型数据
+        blog: {
+          title: '',
+          content: '输入两个整数，求这两个整数的和是多少。\n' +
+                  '\n' +
+                  '输入格式:\n' +
+                  '输入两个整数A,B，用空格隔开\n' +
+                  '\n' +
+                  '输出格式:\n' +
+                  '输出一个整数，表示这两个数的和\n' +
+                  '\n' +
+                  '数据范围:\n' +
+                  '0≤A,B≤108\n' +
+                  '样例输入:\n' +
+                  '3 4\n' +
+                  '样例输出:\n' +
+                  '7',
+          outline: '',
+          bid: "",
+          commentabled: "",
+          likes: ""
+        },
+        // 表格数据
+        tableData: [{
+          title: 'vue框架',
+          content: '题目具体信息---',
+          outline: 'vue框架',
+          likes: "1"
+        }, {
+          title: 'vue框架',
+          content: '题目具体信息---',
+          outline: 'vue框架',
+          likes: "1"
+        }, {
+          title: 'vue框架',
+          content: '题目具体信息---',
+          outline: 'vue框架',
+          likes: "1"
+        }, {
+          title: 'vue框架',
+          content: '题目具体信息---',
+          outline: 'vue框架',
+          likes: "1"
+        }]
+      }
+    }
+  })
+
+</script>
+
+</body>
+</html>

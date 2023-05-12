@@ -1,0 +1,133 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" type="text/css"
+        href="./extjs3/resources/css/ext-all.css" />
+  <script type="text/javascript" src="./extjs3/adapter/ext/ext-base.js"></script>
+  <script type="text/javascript" src="./extjs3/ext-all.js"></script>
+  <style type="text/css">
+    html,body {
+      font: normal 12px verdana;
+      margin: 0;
+      padding: 0;
+      border: 0 none;
+      overflow: hidden;
+      height: 100%;
+    }
+  </style>
+
+  <title>Java Compile</title>
+  <script type="text/javascript">
+    Ext.onReady(function() {
+      Ext.BLANK_IMAGE_URL = './extjs3/resources/images/default/s.gif';
+      var text = new Ext.form.TextArea({
+        region : 'center'
+      });
+      var textName = new Ext.form.TextField({
+        fieldLabel : 'Class Name',
+        allowBlank:false,
+        width : '98%'
+
+      });
+      var namePanel = new Ext.Panel({
+        region : 'north',
+        height : '30px',
+        items : [ {
+          xtype : 'form',
+          layout : 'form',
+          labelWidth :70,
+          layoutConfig : {
+            labelSeparator : ':'
+          },
+          labelAlign : 'left',
+          frame : false,
+          padding : '8px',
+          items : [ textName ]
+        } ]
+      });
+      var compileBtn = new Ext.Button({
+        text : 'Compile'
+      });
+      var runBtn = new Ext.Button({
+        text : 'Run'
+      });
+      var panel_text = new Ext.Panel({
+        region : 'center',
+        title : 'Java Compile',
+        layout : 'border',
+        items : [ namePanel, text ],
+        buttons : [ compileBtn, runBtn ]
+      });
+      var console_text = new Ext.form.TextArea({
+        width : '100%',
+        readOnly : true,
+        height : 200
+      });
+      var panel_console = new Ext.Panel({
+        region : 'south',
+        title : 'Console',
+        collapsible : true,
+        height : 200,
+        items : [ console_text ]
+
+      });
+      var viewport = new Ext.Viewport({
+        layout : 'border',
+        items : [ panel_console, panel_text ]
+      });
+
+      var comileSuccess = function(response,ops) {
+        var rs=Ext.util.JSON.decode(response.responseText);
+        console_text.setValue(rs.msg);
+      }
+      var faild = function(e) {
+      }
+      var compile = function(e) {
+        if (e == 'ok') {
+          var javaCode = text.getValue();
+          var clsName = textName.getValue();
+          Ext.Ajax.request({
+            url : 'JavaProcess.sock',
+            method :'GET',
+            success : comileSuccess,
+            failure : faild,
+            params : {
+              action:'compile',
+              file : javaCode,
+              name : clsName
+
+            }
+          });
+        }
+      }
+      compileBtn.on('click', function() {
+        Ext.Msg.show({
+          title : 'Notice',
+          msg : 'Are you sure to compile the code?',
+          buttons : Ext.Msg.OKCANCEL,
+          fn : compile,
+          icon : Ext.MessageBox.QUESTION
+        });
+      });
+      runBtn.on('click',function(){
+        var clsName = textName.getValue();
+        Ext.Ajax.request({
+          url : 'JavaProcess.sock',
+          method :'GET',
+          success : comileSuccess,
+          failure : faild,
+          params : {
+            action:'run',
+            name : clsName
+
+          }
+        });
+      });
+
+    });
+  </script>
+</head>
+</body>
+</html>

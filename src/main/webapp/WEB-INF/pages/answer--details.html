@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>题解详情</title>
+    <style>
+        .el-table .warning-row {
+            background: oldlace;
+        }
+        .el-table .success-row {
+            background: #f0f9eb;
+        }
+        .el-col {
+            border-radius: 4px;
+        }
+        .bg-purple-dark {
+            background: #99a9bf;
+        }
+        .bg-purple {
+            background: #d3dce6;
+        }
+        .bg-purple-light {
+            background: #e5e9f2;
+        }
+        .grid-content {
+            border-radius: 4px;
+            min-height: 36px;
+        }
+        .row-bg {
+            padding: 10px 0;
+            background-color: #f9fafc;
+        }
+        .text {
+            font-size: 14px;
+        }
+        .item {
+            margin-bottom: 18px;
+        }
+        .clearfix:before,
+        .clearfix:after {
+            display: table;
+            content: "";
+        }
+        .clearfix:after {
+            clear: both
+        }
+        .box-card {
+            width: 480px;
+        }
+    </style>
+    <style>
+        .demo-table-expand {
+            font-size: 0;
+        }
+        .demo-table-expand label {
+            width: 90px;
+            color: #99a9bf;
+        }
+        .demo-table-expand .el-form-item {
+            margin-right: 0;
+            margin-bottom: 0;
+            width: 50%;
+        }
+    </style>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="../layui/css/definecss/BlogHome.css" media="all">
+    <script type="text/javascript" src="../layui/layui.js"></script>
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/editormd.css"/>
+    <script src="../static/examples/js/jquery.min.js"></script>
+    <!-- 引入js -->
+    <link rel="stylesheet" href="../static/css/editormd.preview.css"/>
+    <script src="../static/lib/prettify.min.js"></script>
+    <script src="../static/lib/marked.min.js"></script>
+    <script src="../static/editormd.min.js"></script>
+    <script src="../static/lib/raphael.min.js"></script>
+    <script src="../static/lib/underscore.min.js"></script>
+    <script src="../static/lib/sequence-diagram.min.js"></script>
+    <script src="../static/lib/flowchart.min.js"></script>
+    <script src="../static/lib/jquery.flowchart.min.js"></script>
+    <script>
+        layui.use('element', function () {
+            var element = layui.element;
+        });
+        var testEditor;
+        $(function () {
+            testEditor = editormd.markdownToHTML("doc-content", {//注意：这里是上面DIV的id
+                htmlDecode: "style,script,iframe",
+                emoji: true,
+                taskList: true,
+                tocm: true,
+                tocTitle: "目录",
+                tex: true, // 默认不解析
+                flowChart: true, // 默认不解析
+                sequenceDiagram: true, // 默认不解析
+                codeFold: true
+            });
+        });
+    </script>
+</head>
+<body>
+<div id="app">
+    <!--导航菜单栏-->
+    <div class="line"></div>
+    <el-menu
+            :default-active="activeIndex2"
+            class="el-menu-demo"
+            mode="horizontal"
+            @select="handleSelect"
+            background-color="#545c64"
+            text-color="#fff"
+            active-text-color="#ffd04b">
+        <el-menu-item  index="1"><a href="/mainView">个人信息</a></el-menu-item>
+    </el-menu>
+    <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
+        <el-menu-item  index="1"><a href="/questions">题目</a></el-menu-item>
+        <!--<el-menu-item  index="2"><a href="alone&#45;&#45;blog2.html">用户评论</a></el-menu-item>-->
+        <el-menu-item index="4" disabled>题解详情</el-menu-item>
+    </el-menu>
+    题解详情：
+        <el-form ref="form" :model="answer" label-width="80px">
+            <el-form-item label="作者">
+            <el-input label-width="50px" disabled="disabled" v-model="answer.username"></el-input>
+            </el-form-item>
+            <el-form-item label="题解标题">
+                <el-input label-width="50px" disabled="disabled" v-model="answer.title"></el-input>
+            </el-form-item>
+
+            <el-form-item label="题解正文">
+                <el-input disabled="disabled" :rows="40" type="textarea" v-model="answer.content"></el-input>
+                <!--<body style="overflow: auto;min-width:1800px;">
+                                &lt;!&ndash;省略了部分代码只有显示部分&ndash;&gt;
+                                <div class="layui-card-header" style="line-height: 24px!important;height: 24px;width: 95%">
+                                        <span class="showone">{{answer.content}}</span>
+                                </div>
+                                <div class="layui-card-body" style="padding:5px 10px;overflow-x:hidden; overflow-y:scroll;height:1230px!important;">
+                                    <div id="doc-content"  name="doc-content">
+                                        &lt;!&ndash; 书写与实时显示的textarea &ndash;&gt;
+                                        <textarea placeholder="markdown语言">{{answer.content}}</textarea>
+                                    </div>
+                                </div>
+                </body>-->
+            </el-form-item>
+        </el-form>
+    <el-form ref="form" label-width="80px">
+        <el-form-item>
+            <el-button v-show="Like == '取消点赞'" type = "success" @click="judgeLike()" icon="el-icon-s-goods" round>取消点赞 </el-button>
+            <el-button v-show="Like == '点赞'" type = "info" @click="judgeLike()" icon="el-icon-goods" round>点赞</el-button>
+        </el-form-item>
+        <el-form-item>
+            <el-button v-show="Collect == '取消收藏'" type = "primary" @click="judgeCollect()" icon="el-icon-star-on">取消收藏</el-button>
+            <el-button v-show="Collect == '收藏'" type = "info" @click="judgeCollect()" icon="el-icon-star-off">收藏</el-button>
+        </el-form-item>
+    </el-form>
+    <!--骨架1-->
+    <el-row>
+        <el-col :span="12"><div class="grid-content bg-purple"></div></el-col>
+        <el-col :span="12"><div class="grid-content bg-purple-light"></div></el-col>
+    </el-row>
+    <el-row>
+        <el-col :span="12"><div class="grid-content bg-purple"></div></el-col>
+        <el-col :span="12"><div class="grid-content bg-purple-light"></div></el-col>
+    </el-row>
+    <el-row>
+        <el-col :span="12"><div class="grid-content bg-purple"></div></el-col>
+        <el-col :span="12"><div class="grid-content bg-purple-light"></div></el-col>
+    </el-row>
+    <!--评论区-->
+    <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+        <el-form-item label="评论" prop="contents">
+            <el-input type="textarea" placeholder="请输入评论" v-model="ruleForm.contents"></el-input>
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" @click="onSubmitNote('ruleForm')">提交评论</el-button>
+        </el-form-item>
+    </el-form>
+    <!--骨架2-->
+    <el-row>
+        <el-col :span="12"><div class="grid-content bg-purple"></div></el-col>
+        <el-col :span="12"><div class="grid-content bg-purple-light"></div></el-col>
+    </el-row>
+    <el-row>
+        <el-col :span="12"><div class="grid-content bg-purple"></div></el-col>
+        <el-col :span="12"><div class="grid-content bg-purple-light"></div></el-col>
+    </el-row>
+    <el-row>
+        <el-col :span="12"><div class="grid-content bg-purple"></div></el-col>
+        <el-col :span="12"><div class="grid-content bg-purple-light"></div></el-col>
+    </el-row>
+    <!--提交回复评论的表单-->
+
+    <!--表格--><!---->
+    <template>
+        <el-table
+                :data="tableData"
+                style="width: 100%"
+                default-expand-all
+                row-key="id"
+                border
+                :tree-props="{follows: 'follows',hasFollows: 'hasFollows'}"
+                :row-class-name="tableRowClassName"
+                @selection-change="handleSelectionChange"
+        >
+            <el-table-column
+                    prop="content"
+                    label="用户评论"
+                    align="center"
+            >
+            </el-table-column>
+            <el-table-column
+                    prop="nickname"
+                    label="用户"
+                    align="center"
+            >
+            </el-table-column>
+            <el-table-column
+                    align="center"
+                    label="对评论的操作">
+                <template slot-scope="scope">
+                    <el-button v-show="scope.row.isDelete == 1" type="success" icon="el-icon-s-goods"
+                               @click="deleteNoteLike(scope.row)" >取消点赞
+                    </el-button>
+                    <el-button v-show="scope.row.isDelete == 0" type="info" icon="el-icon-goods"
+                               @click="insertNoteLike(scope.row)" >点赞
+                    </el-button>
+                    <el-button type="primary" @click="viewOut(scope.row)">回复</el-button>
+                    <el-dialog
+                            title="评论"
+                            :visible.sync="updateVisible"
+                            width="30%"
+                    >
+                        <el-form ref="form" :model="note" label-width="80px">
+                            <el-form-item label="">
+                                <el-input type="textarea" v-model="note.content"></el-input>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button type="primary" @click="replying">提交</el-button>
+                                <el-button @click="updateVisible = false">取消</el-button>
+                            </el-form-item>
+                        </el-form>
+                    </el-dialog>
+                   <!--<el-dialog
+                            title="修改品牌"
+                            :visible.sync="UpdateVisible"
+                            width="30%"
+                    >
+                        <el-form ref="form" :model="note" label-width="80px">
+                            <el-form-item label="备注">
+                                <el-input type="textarea" v-model="note.content"></el-input>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button type="primary" @click="updateNote">提交</el-button>
+                                <el-button @click="updateVisible = false">取消</el-button>
+                            </el-form-item>
+                        </el-form>
+                    </el-dialog>-->
+                    <!--<el-popover
+                        placement="right"
+                        width="1000"
+                        trigger="click">
+                        <el-form ref="form" :model="ruleForm" label-width="80px">
+                            <el-form-item label="活动形式">
+                                <el-input type="textarea" v-model="ruleForm.contents"></el-input>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button type="primary" @click="replying(scope.ruleForm.contents,scope.row)">提交</el-button>
+                                <el-button>取消</el-button>
+                            </el-form-item>
+                        </el-form>
+                    &lt;!&ndash;<el-table :data="gridData">
+                        <el-table-column width="150" property="date" label="日期"></el-table-column>
+                    </el-table>&ndash;&gt;
+                    <el-button slot="reference" type="primary" circle>回复信息</el-button>
+                    </el-popover>-->
+                </template>
+            </el-table-column>
+            <el-table-column type="expand">
+                <template slot-scope="props">
+                    <!--<el-form label-position="center" inline class="demo-table-expand">
+                        <el-form-item label="商品名称">
+                            <span>{{ props.row.follow.content }}</span>
+                        </el-form-item>
+                    </el-form>-->
+                        <el-table
+                                :data="props.row.follows"
+                                align="right"
+                                border
+                                default-expand-all
+                                style="width: 100%">
+                            <el-table-column
+                                    prop="nickname"
+                                    label="用户名"
+                                    align="center"
+                                    width="300">
+                            </el-table-column>
+                            <el-table-column
+                                    prop="content"
+                                    label="评论"
+                                    align="center"
+                                    type="textarea"
+                                    width="300">
+                            </el-table-column>
+                        </el-table>
+                </template>
+            </el-table-column>
+            <!--<el-table-column
+                    label="商品 ID"
+                    prop="id">
+            </el-table-column>-->
+        </el-table>
+    </template>
+</div>
+
+<script src="/js/vue.js"></script>
+<script src="/element-ui/lib/index.js"></script>
+<script src="/js/axios-0.18.0.js"></script>
+<link rel="stylesheet" href="/element-ui/lib/theme-chalk/index.css">
+
+<script>
+     new Vue({
+        el: "#app",
+        mounted() {//挂载完成
+            //在页面加载完成之后,进行的函数操作 ,发送异步请求，获取数据
+            this.selectAll();
+            this.isLike();
+            this.isCollect();
+            this.selectNote();
+        },
+        methods: {//函数方法的定义区
+            deleteNoteLike(row){
+                axios({
+                    method: "post",
+                    url: "http://localhost/note/update",
+                    data:row
+                }).then(resp =>{
+                    if(resp.data){
+                        this.selectNote();
+                    }
+                })
+            },
+            insertNoteLike(row){
+                axios({
+                    method: "post",
+                    url: "http://localhost/note/update",
+                    data:row
+                }).then(resp =>{
+                    if(resp.data){
+                        this.selectNote();
+                    }
+                })
+            },
+            viewOut(row){
+                this.note.resId= row.id;
+                this.updateVisible = true;
+
+            },
+            replying(){
+                axios({
+                    method: "post",
+                    url: "http://localhost/note/addFollowNote",
+                    data:this.note
+                }).then(resp =>{
+                    if(resp.data){//this.tableData = resp.data;
+                        location.reload();
+                    }
+                })
+            },
+            selectNote(){
+                axios({
+                    method: "post",
+                    url: "http://localhost/note/getAll",
+                }).then(resp =>{
+                    this.tableData = resp.data;
+                    //this.replyData = resp.data.row.follows;
+                })
+            },
+            submitFormNote(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        this.onSubmitNote();
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                });
+            },
+            onSubmitNote(){
+                axios({
+                    method: "post",
+                    url: "http://localhost/note/addMetaNote",
+                    data:this.ruleForm
+                }).then(resp =>{
+                    if(resp.data){
+                        //刷新页面   重新查询数据
+                        location.reload();
+                    }
+                })
+            },
+            judgeLike(){
+                if(this.Like == "点赞"){
+                    this.insertLike();
+                }
+                else if(this.Like == "取消点赞"){
+                    this.deleteLike();
+                }else{
+                    this.$message.error("前端Like出错啦");
+                }
+            }
+            ,
+            judgeCollect(){
+                if(this.Collect == "收藏"){
+                    this.insertCollect();
+                }
+                else if(this.Collect == "取消收藏"){
+                    this.deleteCollect();
+                }else{
+                    this.$message.error("前端Collect出错啦");
+                }
+            },
+            //点赞函数
+            insertLike(){
+                axios({
+                    method: "get",
+                    url: "http://localhost/answer/insertLike",
+                }).then(resp =>{
+                    if(resp.data){
+                        this.$message({
+                            message: '点赞成功',
+                            type: 'success'
+                        })
+                        this.Like="取消点赞";
+                    }
+                })
+            },
+            //取消点赞函数
+            deleteLike(){
+                axios({
+                    method: "get",
+                    url: "http://localhost/answer/deleteLike",
+                }).then(resp =>{
+                    if(resp.data){
+                        this.$message({
+                            message: '取消点赞成功',
+                            type: 'info'
+                        })
+                        this.Like="点赞";
+                    }
+                })
+            },
+            //添加收藏函数
+            insertCollect(){
+                axios({
+                    method: "get",
+                    url: "http://localhost/answer/insertCollect",
+                }).then(resp =>{
+                    if(resp.data){
+                        this.$message({
+                            message: '收藏成功',
+                            type: 'success'
+                        })
+                        this.Collect="取消收藏";
+                    }
+                })
+            },
+            //取消收藏 -->删除函数
+            deleteCollect(){
+                axios({
+                    method: "get",
+                    url: "http://localhost/answer/deleteCollect",
+                }).then(resp =>{
+                    if(resp.data){
+                        this.$message({
+                            message: '取消收藏成功',
+                            type: 'info'
+                        })
+                        this.Collect="收藏";
+                    }
+                })
+            },
+            //判读是否对题解收藏
+            isCollect(){
+                axios({
+                    method: "get",
+                    url: "http://localhost/answer/isCollected",
+                }).then(resp =>{
+                    if(resp.data){
+                        this.Collect="取消收藏";
+                        //alert(this.Collect);
+                    }else{
+                        this.Collect="收藏";
+                    }
+                })
+            },
+            //判断是否对题解点赞
+            isLike(){
+                axios({
+                    method: "get",
+                    url: "http://localhost/answer/isLiked",
+                }).then(resp =>{
+                    if(resp.data){
+                        this.Like = "取消点赞";
+                    }else{
+                        this.Like = "点赞";
+                    }
+                })
+            },
+            //查询
+            selectAll() {
+                axios({
+                    method: "get",
+                    url: "http://localhost/answer/selectByAid",
+                }).then(resp =>{
+                    //设置表格数据
+                    //this.tableData = resp.data;
+                    this.answer = resp.data;
+                    //alert(this.answer);
+                })
+            },
+            onSubmit() {
+                console.log('submit!');
+            },
+            tableRowClassName({row, rowIndex}) {
+                if (rowIndex/2 == 1) {
+                    return 'warning-row';
+                } else{
+                    return 'success-row';
+                }
+                return ' ';
+            },
+        },
+        data() {//变量数据
+            return {
+                allCount:'',
+                id:'',
+                type1:'',
+                type2:'',
+                Collect:'',
+                Like:'',
+                ruleForm: {
+                    contents: ''
+                },
+                rules: {
+                    contents: [
+                        {  }
+                    ]
+                },
+                notes1:{
+                    id:'',
+                    content: '',
+                    nickname:'',
+                    time:'',
+                    resId: '',
+                    replyPost:'',
+                    aid: '',
+                    respondent:''
+                },
+                note: {
+                    id:'',
+                    content: '',
+                    nickname:'',
+                    time:'',
+                    resId: '',
+                    replyPost:'',
+                    aid: '',
+                    respondent:''
+                    /*follows:{
+                        id:'',
+                        content:'',
+                        nickname:'',
+                        time:'',
+                        resId:'',
+                        replyPost:'',
+                    }*/
+                },
+                activeIndex2:'',
+                handleSelect:'',
+                activeIndex:'',
+                question:'',
+                //每页默认显示条数
+                pageSize:5,
+                //当前页面总数据
+                totalCount:'100',
+                // 当前页码
+                currentPage: 1,
+                // 添加数据对话框是否展示的标记
+                dialogVisible: false,
+                updateVisible: false,
+                //问题  --》  模型数据
+                answer:{
+                    aid:"",
+                    title:"",
+                    content:"",
+                    username:"",
+                    bid:"",
+                },
+                // 表格数据
+                questionAnswer: [],
+                //评论表格的信息
+                replyData:[{
+                    id:'',
+                    content: '222222222222222222',
+                    nickname:'666',
+                    time:'',
+                    resId: '',
+                    replyPost:'',
+                    isDelete:'',
+                    aid: '',
+                    respondent:'',
+                    follows: ''
+                }],
+                tableData: [{
+                    id:'',
+                    content: '666',
+                    nickname:'zxc',
+                    time:'',
+                    resId: '',
+                    replyPost:'',
+                    aid: '',
+                    respondent:'',
+                    isDelete:'',
+                    follows:{
+                        content: 'content',
+                        nickname:'nickname',
+                        time:'time',
+                        resId: 'resId',
+                        replyPost:'replyPost',
+                        aid: 'aid',
+                        respondent:'respondent'
+                    }
+                }],
+                //嵌套表格的信息
+                gridData: [{
+                    date: '2016-05-02',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1518 弄'
+                }, {
+                    date: '2016-05-04',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1518 弄'
+                }, {
+                    date: '2016-05-01',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1518 弄'
+                }, {
+                    date: '2016-05-03',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1518 弄'
+                }]
+            }
+        }
+    })
+
+</script>
+
+</body>
+</html>
