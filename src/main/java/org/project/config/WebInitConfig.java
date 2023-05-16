@@ -5,6 +5,8 @@ import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 import javax.servlet.Filter;
+import javax.servlet.ServletContext;
+
 /**
  * @author jackqiu
  */
@@ -37,6 +39,13 @@ public class WebInitConfig extends AbstractAnnotationConfigDispatcherServletInit
         HiddenHttpMethodFilter hiddenHttpMethodFilter = new HiddenHttpMethodFilter();
         return new Filter[]{characterEncodingFilter,hiddenHttpMethodFilter};
     }
+
+    @Override//TODO
+    protected void registerContextLoaderListener(ServletContext servletContext) {
+        super.registerContextLoaderListener(servletContext);
+    }
+
+
     /*
     老版：
 public class ServletContainersInitConfig extends AbstractDispatcherServletInitializer {

@@ -13,7 +13,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User login(String username, String password){
-        return  userMapper.select(username, password);
+        return userMapper.select(username, password);
     }
 
     /**

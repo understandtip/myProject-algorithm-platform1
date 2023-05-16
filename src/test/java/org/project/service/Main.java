@@ -1,12 +1,26 @@
 package org.project.service;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.project.config.SpringConfig;
 import org.project.controller.util.DateUtil;
+import org.project.domain.Note;
+import org.project.mapper.NoteMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = SpringConfig.class)
 public class Main {
+    @Autowired
+    private NoteMapper noteMapper;
+
     @Test
     public void qwe() {
         String opt = "1";
@@ -35,5 +49,12 @@ public class Main {
                 e.printStackTrace();
             }
         }
+    }
+
+    @Test
+    public void testing(){
+        /*PageHelper.startPage(1,4);
+        List<Note> one = noteMapper.getOne();
+        System.out.println(new PageInfo<>(one,5));*/
     }
 }

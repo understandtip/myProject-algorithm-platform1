@@ -22,4 +22,6 @@ public interface NoteMapper {
     //更新表的is_delete(是否点赞)信息
     @Update("update note set is_delete = #{isDelete} where n_id = #{n_id}")
     int update(@Param("isDelete")int isDelete,@Param("n_id") int n_id);
+
+    //List<Note> getOne();
 }

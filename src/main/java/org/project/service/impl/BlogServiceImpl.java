@@ -14,18 +14,22 @@ public class BlogServiceImpl implements BlogService {
     @Autowired
     private BlogMapper blogMapper;
 
+    @Override
     public List<Blog> selectAll() {
         return blogMapper.selectAll();
     }
 
+    @Override
     public void add(Blog blog) {
         blogMapper.add(blog);
     }
 
+    @Override
     public void deleteByIds(int[] ids) {
         blogMapper.deleteByIds(ids);
     }
 
+    @Override
     public PageBean<Blog> selectByPage(int currentPage, int pageSize) {
         int begin = (currentPage - 1) * pageSize;//4. 计算开始索引
         int size = pageSize; // 计算查询条目数
@@ -38,6 +42,7 @@ public class BlogServiceImpl implements BlogService {
         return pageBean;
     }
 
+    @Override
     public PageBean<Blog> selectByPageAndCondition(int currentPage, int pageSize, Blog blog) {
         int begin = (currentPage - 1) * pageSize;//4. 计算开始索引
         int size = pageSize;// 计算查询条目数
@@ -67,6 +72,7 @@ public class BlogServiceImpl implements BlogService {
      * 根据id查询
      * @return
      */
+    @Override
     public Blog selectById(int id){
         return blogMapper.selectById(id);
     }
@@ -75,6 +81,7 @@ public class BlogServiceImpl implements BlogService {
      * 根据id删除
      * @param id
      */
+    @Override
     public void delete(int id) {
         blogMapper.delete(id);
     }
@@ -83,6 +90,7 @@ public class BlogServiceImpl implements BlogService {
      * 修改
      * @param blog
      */
+    @Override
     public void update(Blog blog) {
         //3.调用mapper的update方法
         blogMapper.update(blog);

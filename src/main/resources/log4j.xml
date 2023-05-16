@@ -9,10 +9,10 @@
    </layout>
  </appender>
  <logger name="java.sql">
-   <level value="debug" />
+   <level value="DEBUG" />
  </logger>
  <logger name="org.apache.ibatis">
-   <level value="debug" />
+   <level value="DEBUG" />
  </logger>
  <root>
    <level value="DEBUG" />

@@ -1,5 +1,6 @@
 package org.project.config;
 
+import org.project.controller.ProjectExceptionAdvice;
 import org.project.controller.interceptor.ProjectInterceptor;
 import org.project.controller.interceptor.ProjectInterceptor2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,7 +95,8 @@ public class SpringMvcSupport extends WebMvcConfigurationSupport {
         registry.addViewController("/answerDetails").setViewName("answer--details.html");
         //registry.addViewController("/pages/**").setViewName("/pages/notFound.html");
     }
-/*
+
+    /*
     //7、异常处理
     @Override
     public void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {
@@ -104,7 +106,7 @@ public class SpringMvcSupport extends WebMvcConfigurationSupport {
         exceptionResolver.setExceptionMappings(prop);
         exceptionResolver.setExceptionAttribute("exception");
         resolvers.add(exceptionResolver);
-    }               */
+    }      */
 
 /*  //配置生成模板解析器
     @Bean

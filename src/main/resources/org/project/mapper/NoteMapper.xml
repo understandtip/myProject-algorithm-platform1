@@ -53,4 +53,8 @@
             n1.time desc,
             n2.time
     </select>
+
+    <!--<select id="getOne" resultType="note">
+        select * from note
+    </select>-->
 </mapper>

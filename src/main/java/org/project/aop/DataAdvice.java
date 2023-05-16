@@ -20,24 +20,16 @@ public class DataAdvice {
     3.减少使用..的形式描述包
     4.对接口进行描述，使用*表示模块名，例如UserService的匹配描述为*Service
     5.方法名书写保留动词，例如get，使用*表示名词，例如getById匹配描述为getBy*
-    6.参数根据实际情况灵活调整  */
-    @Pointcut("")//“”双引号里写入对方法名的匹配
+    6.参数根据实际情况灵活调整                    */
+    @Pointcut("execution(* org.project.service.UserService.*(*,*))")//“”双引号里写入对方法名的匹配
     private void servicePt(){}
 
-    @Around("DataAdvice.servicePt()")//环绕通知
-    public Object trimStr(ProceedingJoinPoint pjp) throws Throwable {
-        Object[] args = pjp.getArgs();
-        for (int i = 0; i < args.length; i++) {
-            //判断参数是不是字符串
-            if(args[i].getClass().equals(String.class)){
-                args[i] = args[i].toString().trim();
-            }
-        }
-        Object ret = pjp.proceed(args);//对原始方法的调用
-        return ret;
-    }
-    //另一种方式
-    @Around("")//环绕通知
+    /*@Around("")
+    public Object around(ProceedingJoinPoint joinPoint){
+        return null;
+    }*/
+
+    //@Around("servicePt()")//环绕通知
     public Object aroundMethod(ProceedingJoinPoint joinPoint){
         String methodName = joinPoint.getSignature().getName();
         String args = Arrays.toString(joinPoint.getArgs());
@@ -53,5 +45,20 @@ public class DataAdvice {
             System.out.println("环绕通知-->目标对象方法执行完毕");//后置通知
         }
         return result;
+    }
+
+    //另一种方式
+    //@Around("execution(* org.project.service.UserService.*(*,*))") //环绕通知
+    public Object trimStr(ProceedingJoinPoint pjp) throws Throwable {
+        Object[] args = pjp.getArgs();
+        for (int i = 0; i < args.length; i++) {
+            //判断参数是不是字符串
+            if(args[i].getClass().equals(String.class)){
+                args[i] = args[i].toString().trim();
+            }
+        }
+        System.out.println("trimStr");
+        Object ret = pjp.proceed(args);//对原始方法的调用
+        return ret;
     }
 }

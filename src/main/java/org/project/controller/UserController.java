@@ -16,7 +16,7 @@ import java.io.IOException;
 @Controller
 public class UserController {
     @Autowired
-    private UserService userService ;
+    private UserService userService;
 
     @RequestMapping("/user/login")
     public String login(User user1,HttpSession session,Model model){//1. 获取用户名和密码  --> User user1
@@ -30,6 +30,7 @@ public class UserController {
                 response.addCookie(c_username);//2. 发送
                 response.addCookie(c_password);
             }*/
+
             session.setAttribute("user",user);//将登陆成功后的user对象，存储到session
             return "redirect:/mainView";
         }else {
@@ -49,6 +50,12 @@ public class UserController {
             model.addAttribute("register_msg","注册失败，用户名已存在");
             return "register.jsp";//注册失败，跳转到注册页面
         }
+    }
+
+    @RequestMapping("/user/logOut")
+    public String logOut(HttpSession session){
+        session.invalidate();
+        return "login.jsp";
     }
 
     /*@RequestMapping("/test")
